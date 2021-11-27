@@ -1,2 +1,21 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2>This is SignUp page</h2> <hr>
+
+<form action="{% url 'signup'%}" method="POST">
+        {% csrf_token %}
+        <table>
+         {% for form in form %}
+
+         {{form.label_tag}} {{form}} {{form.errors}} <br> <br>
+
+        {% endfor %}
+         <tr>
+            <td><input type="submit" name="submit" value="Submit"/></td>
+         </tr>
+        </table>
+</form>
 
 
+{% endblock content %}
