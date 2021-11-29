@@ -1,8 +1,29 @@
-{% extends "core/base.html" %}
+{% extends "base.html" %}
 {% block body %} <h2>Welcome:  {{ user_detail.name }}</h2> <br>
 
-    <a  href="{% url 'account' %}"  class="btn btn-outline-success" type="submit">Open Your Account</a>
 <hr>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-5  offset-1 alart alert-success" >
+            <h2 class="text-center alart alert-info" >Fill The Detail </h2>
+            <form action="{% url 'account'%}" method="POST">
+            {% csrf_token %}
+            <table>
+            {% for acc_form in account_form %}
+            {{acc_form.label_tag}} {{acc_form}} {{form.errors}} <br> <br>
+            {% endfor %}
+            <tr>
+                <td><input class="btn btn-success" type="submit" name="submit" value="Submit"/></td>
+            </tr>
+            </table>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+
+
 
 {#<html>#}
 {#  <head>#}
@@ -63,20 +84,3 @@
 {#    </div>#}
 {#  </body>#}
 {#</html>#}
-
-    <form action="{% url 'account'%}" method="POST">
-        {% csrf_token %}
-        <table>
-         {% for acc_form in account_form %}
-         {{acc_form.label_tag}} {{acc_form}} {{form.errors}} <br> <br>
-        {% endfor %}
-         <tr>
-            <td><input type="submit" name="submit" value="Submit"/></td>
-         </tr>
-        </table>
-</form>
-    <br><br> <hr>
-    <table>
-    {{ account_form.as_table }}
-    </table>
-{% endblock body%}
