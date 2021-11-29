@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block body %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+</head>
+<body>
+<h2>User's Account Detail</h2>
+    <a  href="#"  class="btn btn-outline-success" type="submit">Add Money</a>
+{#    <a  href="{% url 'login' %}"  class="btn btn-outline-success" type="submit">Login</a>#}
+
+
+
+<hr>
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+      <th scope="col">Account No</th>
+      <th scope="col">Contact</th>
+      <th scope="col">Address</th>
+      <th scope="col">DOB</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  {% for dtl in account_detail %}
+    <tr>
+      <th scope="row">{{ dtl.user_id }}</th>
+      <td>{{ dtl.user }}</td>
+      <td>{{ dtl.account_no}}</td>
+      <td>{{ dtl.contact }}</td>
+      <td>{{ dtl.address }}</td>
+      <td>{{ dtl.birth_date }}</td>
+      <td><a href="#" type="submit">Add Money</a>
+    </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+
+</table>
+</body>
+</html>
+
+{% endblock body %}

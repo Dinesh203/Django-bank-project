@@ -16,7 +16,7 @@
         </li>
       </ul>
       <form class="d-flex">
-        <a href="#" class="btn btn-outline-danger" type="submit" >Admin</a>
+        <a href="{% url 'admin_login' %}" class="btn btn-outline-danger" type="submit" >Admin</a>
             <a href="{% url 'signup' %}" class="btn btn-outline-success" type="submit" >SignUp</a>
             {% comment %} <a href="{% url 'MyForm' %}">SignUP</a> {% endcomment %}
             <a  href="{% url 'login' %}"  class="btn btn-outline-success" type="submit">Login</a>

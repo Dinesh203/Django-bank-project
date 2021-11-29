@@ -12,7 +12,15 @@ class UserForm(forms.ModelForm):
 
 
 class UserBankAccountForm(forms.ModelForm):
-    
+
     class Meta:
         model = UserBankAccount
         fields = "__all__"
+
+#
+# class UserBankAccountDetailForm(forms.ModelForm):
+#     class Meta:
+#         model = UserBankAccountDetail
+#         fields = "__all__"
+
+# ,  UserBankAccountDetail
