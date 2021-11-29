@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h2>Send Money To Account</h2>
+    <a href="{% url 'homepage' %}"  class="btn btn-outline-success" type="submit">Back to Home</a><hr>
+
+    <h2>Owner name: {{user_name}}</h2>
+
+<hr>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-5  offset-1 alart alert-danger" >
+            <h2 class="text-center alart alert-success" >Fill The Account Detail  </h2>
+            <form action="{% url 'transection'%}" method="POST">
+            {% csrf_token %}
+            <table>
+            {% for form in form %}
+            {{form.label_tag}} {{form}} <br> <br>
+            {% endfor %}
+            <tr>
+                <td><input class="btn btn-success" type="submit" name="submit" value="Send"/></td>
+            </tr>
+            </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,6 +1,8 @@
 from django.db import models
 import random
 
+from django.db.models.fields import IntegerField
+
 # Create your models here.
 
 
@@ -40,13 +42,8 @@ class BankAccountType(models.Model):
         return self.name
 
 
-num = 9685452175
-
-
 def random_string():
     return str(random.randint(9000000000, 10000000000))
-
-    num += num + 1
 
 
 class UserBankAccount(models.Model):
@@ -65,8 +62,15 @@ class UserBankAccount(models.Model):
 
 
 
+class MoneyTransfer(models.Model):
+    owner = models.ForeignKey(User_Model, on_delete=models.CASCADE, blank=True, null=True)
+    send_from = models.CharField(max_length=10)
+    send_to = models.CharField(max_length=10)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transection_date = models.DateField(auto_now_add=True)
 
-
+    def __str__(self):
+        return str(self.amount)
 
 
 

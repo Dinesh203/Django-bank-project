@@ -1,5 +1,5 @@
 from django import forms
-from .models import User_Model, UserBankAccount
+from .models import User_Model, UserBankAccount, MoneyTransfer
 from django.forms import ModelForm
 
 
@@ -17,6 +17,14 @@ class UserBankAccountForm(forms.ModelForm):
         model = UserBankAccount
         fields = "__all__"
 
+
+class MoneyTransferForm(forms.ModelForm):
+
+    class Meta:
+        model = MoneyTransfer
+        fields = "__all__"
+
+        
 #
 # class UserBankAccountDetailForm(forms.ModelForm):
 #     class Meta:
