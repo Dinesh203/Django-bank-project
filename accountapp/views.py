@@ -1,18 +1,29 @@
 from django.contrib.auth import authenticate
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.shortcuts import HttpResponse
 from django.contrib.auth.models import User
 from .forms import UserForm, UserBankAccountForm, MoneyTransferForm
-from .models import User_Model, UserBankAccount, BankAccountType
+from .models import User_Model, UserBankAccount, BankAccountType, MoneyTransfer
 import decimal
 
 
 # Create your views here.
+# def get_user_name(request):
+#     mail_id = request.session['email']
+#     user_id = User_Model.objects.get(email=mail_id)
+#     user_name = user_id.name
+#     print(user_name)
+#     return user_name
+#
+#
+# print(get_user_name(request))
 
 
 def home(request):
+    """"
+    :return: home page
+    """
     try:
         mail_id = request.session['email']
         user_id = User_Model.objects.get(email=mail_id)
@@ -21,14 +32,17 @@ def home(request):
         e = "Your session is expired please Login again"
         return render(request, 'accountapp/home.html', {'exception': e})
     return render(request, 'accountapp/home.html', {'user_name': user_name})
-    
+
 
 def signup(request):
+    """
+    :return: Signup page and Create user basic detail.
+    """
     if request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
             form.save()
-            # messages.success(request, 'Created User successfully!')
+            # msg = messages.success(request, 'Created User successfully!')
             return render(request, "accountapp/user_login.html")
     else:
         form = UserForm()
@@ -36,6 +50,9 @@ def signup(request):
 
 
 def login(request):
+    """
+    :return: login and authenticate User detail
+    """
     if request.method == 'POST':
         email1 = request.POST['email']
         password1 = request.POST['password']
@@ -44,35 +61,35 @@ def login(request):
             return redirect('homepage')
         else:
             msg = "invalid input please try again"
-            return render(request, 'accountapp/user_login.html', {'mssg': msg})
+            return render(request, 'accountapp/user_login.html', {'msgs': msg})
     else:
         return render(request, 'accountapp/user_login.html')
 
 
 def account(request):
+    """
+    This function help to Create an account.
+    """
     mail_id = request.session['email']
     if User_Model.objects.get(email=mail_id):
         mail_id = request.session['email']
         user_id = User_Model.objects.get(email=mail_id)
-        user_name = user_id.name
         acc_type = BankAccountType.objects.all()
         for i in acc_type:
             type_name = i.name
-            print(i.name)
         account_form = UserBankAccountForm()
         content = {'account_form': account_form,
-                'user_detail': user_id
-                }
+                   'user_detail': user_id
+                   }
         if request.method == "POST":
-            account_type1 = request.POST['account_type']
             account_no1 = request.POST['account_no']
             initial_balance1 = request.POST['initial_balance']
             gender1 = request.POST['gender']
             birth_date1 = request.POST['birth_date']
             address1 = request.POST['address']
             obj = UserBankAccount.objects.create(user=user_id, account_type=type_name, account_no=account_no1,
-                                                initial_balance=initial_balance1, gender=gender1,
-                                                birth_date=birth_date1, address=address1)
+                                                 initial_balance=initial_balance1, gender=gender1,
+                                                 birth_date=birth_date1, address=address1)
             obj.save()
             messages.success(request, "Account added successfully!")
             return redirect('homepage')
@@ -84,6 +101,8 @@ def account(request):
 
 
 def admin_login(request):
+    """ This is super admin login page
+    """
     if request.method == "POST":
         username = request.POST['Username']
         password1 = request.POST['password']
@@ -91,50 +110,79 @@ def admin_login(request):
             account_detail = UserBankAccount.objects.all()
             return render(request, "accountapp/admin_panel.html", {'account_detail': account_detail})
         else:
-            msg = "Ty again, Fill correct Detail"
+            msg = "Try again, Fill correct Detail"
             return render(request, "accountapp/admin_access.html", {"msg": msg})
     else:
         admin = User.objects.all()
     return render(request, "accountapp/admin_access.html", {'admin': admin})
 
 
-
 def logout(request):
+    """ This function helps to delete the Session.
+    """
     del request.session["email"]
     return render(request, 'base.html')
 
 
-def transection(request):
-    mail_id = request.session['email']
-    user_id = User_Model.objects.get(email=mail_id)
-    user_name = user_id.name
+def transaction(request):
+    """
+    Make a transaction, send Money to another account holder
+    """
     if request.method == 'POST':
         form = MoneyTransferForm(request.POST)
         if form.is_valid():
-            sender = UserBankAccount.objects.get(account_no=request.POST.get('send_from'))
+            sender = UserBankAccount.objects.get(account_no=request.POST.get('from_account'))
+            print(sender)
             if sender.initial_balance > decimal.Decimal(request.POST.get('amount')):
-
-                trans =  form.save()
-                trans.owner = request.User_model.user
-                trans.save()
+                form.save()
 
                 # debit the sender account
-                sender.account_balance -= decimal.Decimal(request.POST.get('amount'))
+                sender.initial_balance -= decimal.Decimal(request.POST.get('amount'))
                 sender.save()
 
-                #credit the receiver account
-                receiver = UserBankAccount.objects.get(account_no=request.POST.get('send_to'))
+                # credit the receiver account
+                receiver = UserBankAccount.objects.get(account_no=request.POST.get('from_to'))
                 receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
                 receiver.save()
-
                 return redirect("homepage")
-            # else:
-            #     return 
+            else:
+                message = "Insufficient Balance"
+                return render(request, "accountapp/transfer_money.html", {"message": message})
+        else:
+            messages.info(request, "Invalid Info please try again")
+            return redirect("homepage")
     else:
+        mail_id = request.session['email']
+        user_id = User_Model.objects.get(email=mail_id)
         form = MoneyTransferForm()
-        return render(request, "accountapp/transfer_money.html", {'form': form, 'user_name': user_name})
+        user_balance = UserBankAccount.objects.filter(user=user_id)
+        for b in user_balance:
+            print(b.initial_balance)
+        content = {
+            'form': form,
+            'user_name': user_id.name,
+            'balance': b.initial_balance
+        }
+        return render(request, "accountapp/transfer_money.html", content)
 
 
+def transaction_history(request):
+    """
+    :return: View transaction history
+    """
+    trans_history = MoneyTransfer.objects.all()
+    return render(request, "accountapp/transactions.html", {'trans_history': trans_history})
+
+
+
+
+# def show_balane(request):
+#     mail_id = request.session['email']
+#     user_id = User_Model.objects.get(email=mail_id)
+#     user_bal = UserBankAccount.objects.get("initial_balance")
+#     print(user_bal)
+#     owner_balance = UserBankAccount.objects.get(initial_balance=UserBankAccount.objects.get(user=user_id))
+#     print(owner_balance)
 
 
 # , date_of_opening=date_of_opening1
@@ -170,5 +218,8 @@ def transection(request):
 #     else:
 #         pass
 #     return render(request, "accountapp/create_acc.html", content)
+
+#
+
 
 #

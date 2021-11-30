@@ -9,8 +9,9 @@ urlpatterns = [
     path('logout/', views.logout, name="logout"),
     path('account/', views.account, name="account"),
     path('admin_login/', views.admin_login, name="admin_login"),
-    path('transection/', views.transection, name="transection"),
-  
+    path('transaction/', views.transaction, name="transaction"),
+    # path('show_balane/', views.show_balane, name="show_balane"),
+
 
 ]
 

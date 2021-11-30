@@ -1,22 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
+     {% if msg in msgs %}
+         {{msg}}
+     {% else %}
     <h2>Login here</h2>
-<form action='{% url 'login'%}' method='POST'>
-    {% csrf_token %}
-    <label for="email">Mail Id: </label>
-    <input id="email" type='email' name='email'><br><br>
+    <form action='{% url 'login'%}' method='POST'>
+        {% csrf_token %}
+        <label for="email">Mail Id: </label>
+        <input id="email" type='email' name='email'><br><br>
 
-    <label for="pass">Password: </label>
-    <input id="pass" type='password' name='password'><br><br>
+        <label for="pass">Password: </label>
+        <input id="pass" type='password' name='password'><br><br>
 
-    <table>
-        <tr>
-         <td><input type="submit" name="submit" value="Submit"/></td>
-        </tr>
-    </table>
- {% if msg in mssg %}
-        {{msg}}
+        <table>
+            <tr>
+             <td><input type="submit" name="submit" value="Submit"/></td>
+            </tr>
+        </table>
+    </form>
+
     {% endif %}
 {#<a href="{% url 'SignUp' %}">Go to sighup page</a>#}
 

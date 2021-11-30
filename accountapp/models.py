@@ -20,7 +20,6 @@ ACCOUNT_TYPE = (
     (SILVER, "SILVER"),
     (GOLD, "GOLD"),
     (PLATINUM, "PLATINUM")
-
 )
 
 
@@ -61,18 +60,15 @@ class UserBankAccount(models.Model):
         return str(self.account_no)
 
 
-
 class MoneyTransfer(models.Model):
     owner = models.ForeignKey(User_Model, on_delete=models.CASCADE, blank=True, null=True)
-    send_from = models.CharField(max_length=10)
-    send_to = models.CharField(max_length=10)
+    from_account = models.CharField(max_length=10)
+    from_to = models.CharField(max_length=10)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    transection_date = models.DateField(auto_now_add=True)
+    transaction_date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return str(self.amount)
-
-
 
 # class UserBankAccountDetail(models.Model):
 #     name = models.CharField(max_length=150)
