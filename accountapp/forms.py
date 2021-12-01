@@ -2,6 +2,8 @@ from django import forms
 from .models import User_Model, UserBankAccount, MoneyTransfer
 from django.forms.widgets import NumberInput
 from django.forms import ModelForm
+
+
 # from .views import get_user_name
 
 
@@ -21,7 +23,6 @@ class UserBankAccountForm(forms.ModelForm):
     :return: User account form detail
     """
     birth_date = forms.DateField(widget=NumberInput(attrs={'type': 'date'}))
-    # user = forms.CharField(widget=forms.HiddenInput(), initial=get_user_name())
 
     class Meta:
         model = UserBankAccount
@@ -33,8 +34,11 @@ class MoneyTransferForm(forms.ModelForm):
 
     class Meta:
         model = MoneyTransfer
-        fields = "__all__"
+        fields = ['owner', 'from_account', 'from_to', 'amount', 'remark']
         # exclude = ('owner',)
+
+
+
 
 
 
@@ -44,3 +48,4 @@ class MoneyTransferForm(forms.ModelForm):
 #         fields = "__all__"
 
 # ,  UserBankAccountDetail
+# user = forms.CharField(widget=forms.HiddenInput(), initial=get_user_name())

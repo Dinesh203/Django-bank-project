@@ -10,7 +10,7 @@ urlpatterns = [
     path('account/', views.account, name="account"),
     path('admin_login/', views.admin_login, name="admin_login"),
     path('transaction/', views.transaction, name="transaction"),
-    # path('show_balane/', views.show_balane, name="show_balane"),
+    path('tran_history/', views.transaction_history, name="transaction_history"),
 
 
 ]

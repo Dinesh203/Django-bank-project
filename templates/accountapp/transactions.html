@@ -9,35 +9,41 @@
 </head>
 <body>
 
-    <h2>Transaction History</h2>
+    <h2>Transaction History</h2><hr>
+        <h4>Account Holder : {{ user_name }}</h4>
+     <h3>From Account no : {{ user_acc_detail }}</h3>
+
+
 {#    <a  href="#"  class="btn btn-outline-success" type="submit">Add Money</a>#}
 {#    <a  href="{% url 'login' %}"  class="btn btn-outline-success" type="submit">Login</a>#}
-
+<h5 class="text-center">statement</h5>
 <hr>
     <table class="table">
   <thead>
     <tr>
       <th scope="col">Id</th>
       <th scope="col">Date</th>
-      <th scope="col">Particular</th>
-      <th scope="col">Status</th>
-      <th scope="col">Amount</th>
-      <th scope="col">Closing Balance</th>>
+      <th scope="col">particular</th>
+      <th scope="col">Debit</th>
+      <th scope="col">Credit</th>
+      <th scope="col">Closing Balance</th>
     </tr>
   </thead>
 
   <tbody>
-  {% for transact in trans_history %}
+  {% for transact in tran_id %}
     <tr>
       <th scope="row">{{ transact.id }}</th>
-      <td>{{ transact.date_error_message }}</td>
-      <td>{{ transact.account_no}}</td>
-      <td>{{ transact.contact }}</td>
+      <td>{{ transact.transaction_date }}</td>
+      <td>to {{ transact.from_to }}/ {{ transact.remark }}</td>
       <td>{{ transact.amount }}</td>
+      <td>NA</td>
+      <td>{{ transact.opening_balance }}</td>
 {#      <td><a href="#" type="submit">Add Money</a>#}
     </td>
     </tr>
   {% endfor %}
+
   </tbody>
 
 </table>

@@ -12,8 +12,8 @@
     {% else %}
         <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-5  offset-1 alart alert-danger" >
-            <h2 class="text-center alart alert-success" >Fill The Account Detail  </h2>
+        <div class="col-sm-5  offset-1 alert alert-danger" >
+            <h3 class="text-center alert alert-success" >Fill The Account Detail  </h3>
             <form action="{% url 'transaction'%}" method="POST">
             {% csrf_token %}
             <table>

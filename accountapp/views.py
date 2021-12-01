@@ -132,13 +132,18 @@ def transaction(request):
         form = MoneyTransferForm(request.POST)
         if form.is_valid():
             sender = UserBankAccount.objects.get(account_no=request.POST.get('from_account'))
-            print(sender)
+            print("sender", sender)
             if sender.initial_balance > decimal.Decimal(request.POST.get('amount')):
-                form.save()
-
-                # debit the sender account
                 sender.initial_balance -= decimal.Decimal(request.POST.get('amount'))
                 sender.save()
+
+                # update form field from form data
+                new_key = form.save()
+                opening_bal = MoneyTransfer.objects.get(id=new_key.pk)
+                opening_bal.opening_balance = decimal.Decimal(sender.initial_balance)
+                # closing_bal.closing_balance = 423
+                opening_bal.save()
+                print(opening_bal.opening_balance)
 
                 # credit the receiver account
                 receiver = UserBankAccount.objects.get(account_no=request.POST.get('from_to'))
@@ -170,12 +175,26 @@ def transaction_history(request):
     """
     :return: View transaction history
     """
-    trans_history = MoneyTransfer.objects.all()
-    return render(request, "accountapp/transactions.html", {'trans_history': trans_history})
+    mail_id = request.session['email']
+    user_id = User_Model.objects.get(email=mail_id)
+    tran_id = MoneyTransfer.objects.filter(owner__email=mail_id)
+    balance_id = UserBankAccount.objects.filter(user__email=mail_id)
+    print(balance_id)
+    for bal in balance_id:
+        balance = bal.initial_balance
+    print(user_id.name)
+    for tran in tran_id:
+        account_no = tran.from_account
+    content = {
+        'tran_id': tran_id,
+        'user_acc_detail': account_no,
+        'user_name': user_id.name,
+        'balance': balance,
+        'balance_id': balance_id
+    }
+    return render(request, "accountapp/transactions.html", content)
 
-
-
-
+#
 # def show_balane(request):
 #     mail_id = request.session['email']
 #     user_id = User_Model.objects.get(email=mail_id)
