@@ -7,11 +7,13 @@
 {% if exception %}
     {% include 'core/navbar.html' %}
     <br>
+    {{exception}}
     <h4>If you are new to to page please signup details and login first.</h4>
 
 {#for existing customers#}
 {% elif account_detail%}
-     <h2>Welcome: {{user_name}} </h2> 
+     <h2>Welcome: {{user_name}} </h2>
+     <h2>account Number : {{account_detail.account_no}}</h2>
      <a  href="{% url 'logout' %}"  class="btn btn-outline-success" type="submit">Logout</a> <hr>
 
      <div class="container-fluid">

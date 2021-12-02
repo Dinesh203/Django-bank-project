@@ -34,7 +34,7 @@ class MoneyTransferForm(forms.ModelForm):
 
     class Meta:
         model = MoneyTransfer
-        fields = ['owner', 'from_account', 'from_to', 'amount', 'remark']
+        fields = ['owner', 'from_to', 'amount', 'remark']
         # exclude = ('owner',)
 
 

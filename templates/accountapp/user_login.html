@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
+
 {% block content %}
      {% if msgs %}
     <h2>Login here</h2>
-    <form action='{% url 'login'%}' method='POST'>
+    <form action='{% url 'login' %}' method='POST'>
         {% csrf_token %}
         <label for="email">Mail Id: </label>
         <input id="email" type='email' name='email'><br><br>

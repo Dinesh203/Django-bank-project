@@ -18,34 +18,23 @@ import decimal
 #
 # print(get_user_name(request))
 
-
 def home(request):
     """" home page """
     if 'email' in request.session:
         mail_id = request.session['email']
         user_id = User_Model.objects.get(email=mail_id)
         user_name = user_id.name
-        account_detail = UserBankAccount.objects.get(user__email=mail_id)
-        content = {
-            'user_name': user_name,
-            'account_detail': account_detail
-        }
-        return render(request, 'accountapp/home.html', content)
+        if UserBankAccount.objects.filter(user__email=mail_id).exists():
+            account_detail = UserBankAccount.objects.get(user__email=mail_id)
+            content = {
+                'user_name': user_name,
+                'account_detail': account_detail
+            }
+            return render(request, 'accountapp/home.html', content)
     else:
         e = "error occur!"
         return render(request, 'accountapp/home.html', {'exception': e})
-
-
-def services(request):
-    mail_id = request.session['email']
-    user_id = User_Model.objects.get(email=mail_id)
-    user_name = user_id.name
-    account_detail = UserBankAccount.objects.get(user__email=mail_id)
-    content = {
-        'user_name': user_name,
-        'account_detail': account_detail
-    }
-    return render(request, 'accountapp/home.html', content)
+    return render(request, 'accountapp/home.html')
 
 
 def signup(request):
@@ -106,7 +95,7 @@ def account(request):
                                                  birth_date=birth_date1, address=address1)
             obj.save()
             # messages.success(request, "Account added successfully!")
-            return redirect('services')
+            return redirect('homepage')
         else:
             pass
         return render(request, "accountapp/create_acc.html", content)
@@ -145,27 +134,30 @@ def transaction(request):
     if request.method == 'POST':
         form = MoneyTransferForm(request.POST)
         if form.is_valid():
-            sender = UserBankAccount.objects.get(account_no=request.POST.get('from_account'))
+            sender = UserBankAccount.objects.get(user__email=request.session['email'])
+            
             print("sender", sender)
             if sender.initial_balance > decimal.Decimal(request.POST.get('amount')):
                 sender.initial_balance -= decimal.Decimal(request.POST.get('amount'))
-                sender.save()
-
-                # update form field from form data
-                new_key = form.save()
-                opening_bal = MoneyTransfer.objects.get(id=new_key.pk)
-                opening_bal.opening_balance = decimal.Decimal(sender.initial_balance)
-                # closing_bal.closing_balance = 423
-                opening_bal.save()
-                print(opening_bal.opening_balance)
 
                 # credit the receiver account
                 receiver = UserBankAccount.objects.get(account_no=request.POST.get('from_to'))
                 receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
+                sender.save()
                 receiver.save()
-                return redirect("services")
+
+                # update form field from form data
+                new_key = form.save()
+                add_value = MoneyTransfer.objects.get(id=new_key.pk)
+                add_value.from_account = sender.account_no
+                add_value.opening_balance = decimal.Decimal(sender.initial_balance)
+
+                # closing_bal.closing_balance = 423
+                add_value.save()
+                print(add_value.opening_balance)
+                return redirect("homepage")
             else:
-                message = "Insufficient Balance"
+                message = "Insufficient Balance!"
                 return render(request, "accountapp/transfer_money.html", {"message": message})
         else:
             messages.info(request, "Invalid Info please try again")
@@ -189,21 +181,17 @@ def transaction_history(request):
     """
     :return: View transaction history
     """
-
     mail_id = request.session['email']
     user_id = User_Model.objects.get(email=mail_id)
-    tran_id = MoneyTransfer.objects.filter(owner__email=mail_id)
+    statement_id = MoneyTransfer.objects.filter(owner__email=mail_id)
     balance_id = UserBankAccount.objects.filter(user__email=mail_id)
-    print(balance_id)
     for bal in balance_id:
         balance = bal.initial_balance
-    print(user_id.name)
-    for tran in tran_id:
-        account_no = tran.from_account
-        print(account_no)
+    for statement in statement_id:
+        account_no = statement.from_account
     content = {
-        'tran_id': tran_id,
-        'user_acc_detail': account_no,
+        'tran_id': statement_id,
+        'owner_account_no': account_no,
         'user_name': user_id.name,
         'balance': balance,
         'balance_id': balance_id
