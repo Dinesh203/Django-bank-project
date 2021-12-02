@@ -1,8 +1,7 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
 import random
-
-from django.db.models.fields import IntegerField
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -43,6 +42,8 @@ class BankAccountType(models.Model):
 
 
 def random_string():
+    """provide random account number
+    """
     return str(random.randint(9000000000, 10000000000))
 
 
@@ -62,6 +63,7 @@ class UserBankAccount(models.Model):
 
 
 class MoneyTransfer(models.Model):
+    """This model provide money transaction fields """
     owner = models.ForeignKey(User_Model, on_delete=models.CASCADE, blank=True, null=True)
     from_account = models.CharField(max_length=10)
     from_to = models.CharField(max_length=10)
@@ -95,3 +97,4 @@ class MoneyTransfer(models.Model):
 #     #     return self.name
 
 # user = models.OneToOneField(User_Model, related_name='account', on_delete=models.CASCADE)
+from django.db.models.fields import IntegerField

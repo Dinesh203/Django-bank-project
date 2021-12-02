@@ -16,22 +16,36 @@ import decimal
 #     print(user_name)
 #     return user_name
 #
-#
 # print(get_user_name(request))
 
 
 def home(request):
-    """"
-    :return: home page
-    """
-    try:
+    """" home page """
+    if 'email' in request.session:
         mail_id = request.session['email']
         user_id = User_Model.objects.get(email=mail_id)
         user_name = user_id.name
-    except Exception as e:
-        e = "Your session is expired please Login again"
+        account_detail = UserBankAccount.objects.get(user__email=mail_id)
+        content = {
+            'user_name': user_name,
+            'account_detail': account_detail
+        }
+        return render(request, 'accountapp/home.html', content)
+    else:
+        e = "error occur!"
         return render(request, 'accountapp/home.html', {'exception': e})
-    return render(request, 'accountapp/home.html', {'user_name': user_name})
+
+
+def services(request):
+    mail_id = request.session['email']
+    user_id = User_Model.objects.get(email=mail_id)
+    user_name = user_id.name
+    account_detail = UserBankAccount.objects.get(user__email=mail_id)
+    content = {
+        'user_name': user_name,
+        'account_detail': account_detail
+    }
+    return render(request, 'accountapp/home.html', content)
 
 
 def signup(request):
@@ -91,8 +105,8 @@ def account(request):
                                                  initial_balance=initial_balance1, gender=gender1,
                                                  birth_date=birth_date1, address=address1)
             obj.save()
-            messages.success(request, "Account added successfully!")
-            return redirect('homepage')
+            # messages.success(request, "Account added successfully!")
+            return redirect('services')
         else:
             pass
         return render(request, "accountapp/create_acc.html", content)
@@ -149,7 +163,7 @@ def transaction(request):
                 receiver = UserBankAccount.objects.get(account_no=request.POST.get('from_to'))
                 receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
                 receiver.save()
-                return redirect("homepage")
+                return redirect("services")
             else:
                 message = "Insufficient Balance"
                 return render(request, "accountapp/transfer_money.html", {"message": message})
@@ -175,6 +189,7 @@ def transaction_history(request):
     """
     :return: View transaction history
     """
+
     mail_id = request.session['email']
     user_id = User_Model.objects.get(email=mail_id)
     tran_id = MoneyTransfer.objects.filter(owner__email=mail_id)
@@ -185,6 +200,7 @@ def transaction_history(request):
     print(user_id.name)
     for tran in tran_id:
         account_no = tran.from_account
+        print(account_no)
     content = {
         'tran_id': tran_id,
         'user_acc_detail': account_no,

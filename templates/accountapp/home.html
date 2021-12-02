@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 
 {% block body %}
-{% include 'core/navbar.html' %}
+{#{% include 'core/navbar.html' %}#}
 <br>
+{#handel exception for invalid login attempt#}
+{% if exception %}
+    {% include 'core/navbar.html' %}
+    <br>
+    <h4>If you are new to to page please signup details and login first.</h4>
 
-{% if exception in exception %}
-<h2>{{exception}}</h2>
-{% else %}
-     
+{#for existing customers#}
+{% elif account_detail%}
      <h2>Welcome: {{user_name}} </h2> 
      <a  href="{% url 'logout' %}"  class="btn btn-outline-success" type="submit">Logout</a> <hr>
 
@@ -15,9 +18,6 @@
           <div class="row">
                 <h2>Our services: </h2>
           <div class="col-sm-4  offset-1 alert alert" >
-
-          <h3>Open Account -</h3>
-          <a  href="{% url 'account' %}"  class="btn btn-outline-success" type="submit">Open Account</a> <hr>
 
           <h3>Money Transfer -</h3> 
           <a  href="{% url 'transaction' %}"  class="btn btn-outline-info" type="submit">Send Money</a> <hr>
@@ -42,6 +42,23 @@
           </div>
      </div>
      </div>
-     {% endif %}
+
+{#for new users#}
+{% else %}
+     <h2>Welcome: {{user_name}} </h2>
+     <a  href="{% url 'logout' %}"  class="btn btn-outline-success" type="submit">Logout</a> <hr>
+
+     <div class="container-fluid">
+          <div class="row">
+                <h2>For new Users </h2>
+          <div class="col-sm-4  offset-1 alert alert">
+
+          <h3>Open Account -</h3>
+          <a  href="{% url 'account' %}"  class="btn btn-outline-success" type="submit">Open Account</a> <hr>
+          </div>
+     </div>
+     </div>
+
+{% endif %}
 
 {% endblock body %}
