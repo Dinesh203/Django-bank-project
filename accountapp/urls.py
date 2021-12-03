@@ -8,9 +8,9 @@ urlpatterns = [
     path('login/', views.login, name="login"),
     path('logout/', views.logout, name="logout"),
     path('account/', views.account, name="account"),
-    # path('services/', views.services, name="services"),
+    path('withdraw/', views.withdraw, name="withdraw"),
     path('admin_login/', views.admin_login, name="admin_login"),
-    path('transaction/', views.transaction, name="transaction"),
+    path('send_money/', views.send_money, name="send_money"),
     path('tran_history/', views.transaction_history, name="transaction_history"),
 
 

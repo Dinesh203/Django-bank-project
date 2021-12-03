@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block body %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Withdrawal</title>
+</head>
+<body>
+    <br>
+        <div class=" text-center" style="border: rgb(122, 115, 161); background-color: rgb(168, 181, 211); ">
+    <h1>Withdraw money</h1>
+        </div><hr>
+    <h4>Account Holder : {{ user_name }}</h4>
+    <h3>From Account no : {{ owner_account_no }}</h3> <hr>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-5  offset-1 alert alert-danger" >
+            <h4 class="text-center alert alert-dark" >Fill Detail</h4>
+            <form action="{% url 'withdraw'%}" method="POST">
+                {% csrf_token %}
+            <p>
+            <label>Enter Amount
+            <input type="text" name="amount" required>
+            </label>
+            </p>
+            <p>
+            <label>Reason
+            <input type="tel" name="remark">
+            </label>
+            </p>
+             <table>
+            <tr>
+             <td><input type="submit" name="submit" value="Comferm"/></td>
+            </tr>
+            </table>
+            </form>
+            </div>
+        </div>
+    </div>
+{% if message %}
+    <h3>Error occur = {{ message }}</h3>
+{% endif %}
+</body>
+</html>
+
+{% endblock body %}

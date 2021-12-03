@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 import random
 from django.contrib.auth.models import User
@@ -53,7 +53,7 @@ class UserBankAccount(models.Model):
     account_no = models.PositiveIntegerField(unique=True, default=random_string())
     initial_balance = models.DecimalField(default=0, max_digits=12, decimal_places=2)
     date_of_opening = models.DateField(auto_now_add=True, null=True)
-    contact = models.PositiveIntegerField(null=True, validators=[MaxValueValidator(9999999999)])
+    contact = models.PositiveIntegerField(null=True, validators=[MaxValueValidator(9999999999), MinValueValidator(999)])
     gender = models.CharField(max_length=1, choices=GENDER_CHOICE)
     birth_date = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=50, blank=True)
@@ -66,8 +66,9 @@ class MoneyTransfer(models.Model):
     """This model provide money transaction fields """
     owner = models.ForeignKey(User_Model, on_delete=models.CASCADE, blank=True, null=True)
     from_account = models.CharField(max_length=10)
-    from_to = models.CharField(max_length=10)
+    to_account = models.CharField(max_length=10, null=False)
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    deposit_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     transaction_date = models.DateField(auto_now_add=True)
     remark = models.CharField(max_length=50, null=True)
     opening_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)

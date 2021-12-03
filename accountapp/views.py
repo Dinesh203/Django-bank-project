@@ -7,17 +7,7 @@ from .forms import UserForm, UserBankAccountForm, MoneyTransferForm
 from .models import User_Model, UserBankAccount, BankAccountType, MoneyTransfer
 import decimal
 
-
-# Create your views here.
-# def get_user_name(request):
-#     mail_id = request.session['email']
-#     user_id = User_Model.objects.get(email=mail_id)
-#     user_name = user_id.name
-#     print(user_name)
-#     return user_name
-#
-# print(get_user_name(request))
-
+oklo="iki"
 def home(request):
     """" home page """
     if 'email' in request.session:
@@ -127,7 +117,7 @@ def logout(request):
     return render(request, 'base.html')
 
 
-def transaction(request):
+def send_money(request):
     """
     Make a transaction, send Money to another account holder
     """
@@ -135,22 +125,23 @@ def transaction(request):
         form = MoneyTransferForm(request.POST)
         if form.is_valid():
             sender = UserBankAccount.objects.get(user__email=request.session['email'])
-            
-            print("sender", sender)
+
+            # debit amount from sender account
             if sender.initial_balance > decimal.Decimal(request.POST.get('amount')):
                 sender.initial_balance -= decimal.Decimal(request.POST.get('amount'))
-
-                # credit the receiver account
-                receiver = UserBankAccount.objects.get(account_no=request.POST.get('from_to'))
-                receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
-                sender.save()
-                receiver.save()
 
                 # update form field from form data
                 new_key = form.save()
                 add_value = MoneyTransfer.objects.get(id=new_key.pk)
                 add_value.from_account = sender.account_no
+                add_value.owner = sender.user
                 add_value.opening_balance = decimal.Decimal(sender.initial_balance)
+
+                # credit amount from receiver account
+                receiver = UserBankAccount.objects.get(account_no=request.POST.get('to_account'))
+                receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
+                sender.save()
+                receiver.save()
 
                 # closing_bal.closing_balance = 423
                 add_value.save()
@@ -198,15 +189,31 @@ def transaction_history(request):
     }
     return render(request, "accountapp/transactions.html", content)
 
-#
-# def show_balane(request):
-#     mail_id = request.session['email']
-#     user_id = User_Model.objects.get(email=mail_id)
-#     user_bal = UserBankAccount.objects.get("initial_balance")
-#     print(user_bal)
-#     owner_balance = UserBankAccount.objects.get(initial_balance=UserBankAccount.objects.get(user=user_id))
-#     print(owner_balance)
 
+def withdraw(request):
+    """ withdrawal money
+    """
+    if request.method == 'POST':
+        amount1 = request.POST['amount']
+        remark1 = request.POST['remark']
+        transaction_detail = MoneyTransfer.objects.get(owner__email=request.session['email'])
+        opening_balance1 = transaction_detail.opening_balance
+        print(opening_balance1)
+        withdrawal = UserBankAccount.objects.get(user__email=request.session['email'])
+        if withdrawal.initial_balance > decimal.Decimal(amount1):
+            withdrawal.initial_balance -= decimal.Decimal(amount1)
+            withdrawal.save()
+            print(withdrawal.initial_balance)
+            withdraw_form = MoneyTransfer.objects.create(amount=amount1, remark=remark1,
+                                                         opening_balance=withdrawal.initial_balance)
+            withdraw_form.save()
+            return redirect('homepage')
+        else:
+            message = "Transaction Failed!, may be have insufficient balance"
+            return render(request, 'accountapp/withdraw_money.html', {'message': message})
+    # else:
+    #
+    return render(request, 'accountapp/withdraw_money.html')
 
 # , date_of_opening=date_of_opening1
 # date_of_opening1 = request.POST['date_of_opening']

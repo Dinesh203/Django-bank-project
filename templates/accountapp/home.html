@@ -8,7 +8,7 @@
     {% include 'core/navbar.html' %}
     <br>
     {{exception}}
-    <h4>If you are new to to page please signup details and login first.</h4>
+    <h4>If you are new to page please sign up details and login first.</h4>
 
 {#for existing customers#}
 {% elif account_detail%}
@@ -19,13 +19,13 @@
      <div class="container-fluid">
           <div class="row">
                 <h2>Our services: </h2>
-          <div class="col-sm-4  offset-1 alert alert" >
+          <div class="col-sm-4  offset-1 alert alert">
 
           <h3>Money Transfer -</h3> 
-          <a  href="{% url 'transaction' %}"  class="btn btn-outline-info" type="submit">Send Money</a> <hr>
+          <a  href="{% url 'send_money' %}"  class="btn btn-outline-info" type="submit">Send Money</a> <hr>
 
           <h3>Withdraw Money -</h3>
-          <a  href="{% url 'account' %}"  class="btn btn-outline-danger" type="submit">Withdraw</a> <hr>
+          <a  href="{% url 'withdraw' %}"  class="btn btn-outline-danger" type="submit">Withdraw</a> <hr>
 
           </div>
 
@@ -35,9 +35,9 @@
           <h3>Check Transaction History -</h3>
           <a  href="{% url 'transaction_history' %}"  class="btn btn-outline-dark" type="submit">Transaction History</a> <hr>
 
-{#          <h3>Money Transfer -</h3>#}
-{#          <a  href="{% url 'transaction' %}"  class="btn btn-outline-info" type="submit">Send Money</a> <hr>#}
-{##}
+          <h3>Deposit -</h3>
+          <a  href="{% url 'send_money' %}"  class="btn btn-outline-success" type="submit">Deposit Money</a> <hr>
+
 {#          <h3>Withdraw Money -</h3>#}
 {#          <a  href="{% url 'account' %}"  class="btn btn-outline-danger" type="submit">Withdraw</a> <hr>#}
 

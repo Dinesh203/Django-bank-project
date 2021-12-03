@@ -34,18 +34,10 @@ class MoneyTransferForm(forms.ModelForm):
 
     class Meta:
         model = MoneyTransfer
-        fields = ['owner', 'from_to', 'amount', 'remark']
+        fields = ['to_account', 'amount', 'remark']
         # exclude = ('owner',)
 
 
-
-
-
-
-# class UserBankAccountDetailForm(forms.ModelForm):
-#     class Meta:
-#         model = UserBankAccountDetail
-#         fields = "__all__"
 
 # ,  UserBankAccountDetail
 # user = forms.CharField(widget=forms.HiddenInput(), initial=get_user_name())
