@@ -52,8 +52,15 @@
           </tr>
           <tr>
               <th>Status</th>
-              <td><a href="#" class="btn btn-outline-success" type="submit" >Deactivate</a>
-</td>
+              <td>
+                {% if profile.status == True %}
+                <a href="{% url 'change_status' %}" class="btn btn-outline-success" type="submit" >Deactivate
+                  {% else %}
+                  <a href="{% url 'change_status' %}" class="btn btn-outline-success" type="submit" >Activate
+                  {% endif %}
+                  </a>
+                </td>
+
           </tr>
 
   </table>

@@ -8,6 +8,12 @@ from .models import User_Model, UserBankAccount, BankAccountType, MoneyTransfer
 import decimal
 
 
+# account_detail = UserBankAccount.objects.filter(user__email=request.session)
+# for detail in account_detail:
+#     balance = detail.initial_balance
+#     user_name = detail.user
+#     account_no = detail.account_no
+
 def home(request):
     """" home page """
     if 'email' in request.session:
@@ -67,6 +73,8 @@ def account(request):
     if 'email' in request.session:
         if User_Model.objects.get(email=request.session['email']):
             user_id = User_Model.objects.get(email=request.session['email'])
+            user_name = user_id.name
+
             acc_type = BankAccountType.objects.all()
             for i in acc_type:
                 type_name = i.name
@@ -82,7 +90,7 @@ def account(request):
                 contact1 = request.POST['contact']
                 birth_date1 = request.POST['birth_date']
                 address1 = request.POST['address']
-                account_obj = UserBankAccount.objects.create(user=user_id.name, account_type=account_type1,
+                account_obj = UserBankAccount.objects.create(user=user_id, account_type=account_type1,
                                                              account_no=account_no1, initial_balance=initial_balance1,
                                                              gender=gender1, contact=contact1,
                                                              birth_date=birth_date1, address=address1)
@@ -103,14 +111,22 @@ def user_profile(request):
     """ This function helps to user can view profile and update.
     """
     if "email" in request.session:
-        # if request.method == 'POST':
-        #     profile = UserBankAccount.objects.filter(email=request.session['email'])
-        #     return render(request, 'accountapp/updateprofile.html', {"profile": profile})
-        # else:
         profile = UserBankAccount.objects.get(user__email=request.session['email'])
         return render(request, 'accountapp/user_profile.html', {"profile": profile})
     else:
         return redirect("login")
+
+
+def change_status(request):
+    change_status = UserBankAccount.objects.get(user__email=request.session['email'])
+    print(change_status.status)
+    if change_status.status == True:
+        change_status.status = False
+        change_status.save()
+    else:
+        change_status.status = True
+        change_status.save()
+    return redirect('homepage')
 
 
 def delete_account(request, id):
@@ -154,54 +170,58 @@ def send_money(request):
     """
     Make a transaction, send Money to another account holder.
     """
-    if request.method == 'POST':
-        form = MoneyTransferForm(request.POST)
-        if form.is_valid():
-            sender = UserBankAccount.objects.get(user__email=request.session['email'])
+    check_status = UserBankAccount.objects.get(user__email=request.session['email'])
+    if check_status.status == True:
+        if request.method == 'POST':
+            form = MoneyTransferForm(request.POST)
+            if form.is_valid():
+                sender = UserBankAccount.objects.get(user__email=request.session['email'])
 
-            # debit amount from sender account
-            if sender.initial_balance > decimal.Decimal(request.POST.get('amount')):
-                sender.initial_balance -= decimal.Decimal(request.POST.get('amount'))
+                # debit amount from sender account
+                if sender.initial_balance > decimal.Decimal(request.POST.get('amount')):
+                    sender.initial_balance -= decimal.Decimal(request.POST.get('amount'))
 
-                # update form field from form data
-                new_key = form.save()
-                add_value = MoneyTransfer.objects.get(id=new_key.pk)
-                add_value.from_account = sender.account_no
-                add_value.transaction_mode = "send-money"
-                add_value.owner = sender.user
-                add_value.deposit_amount = decimal.Decimal(0)
-                add_value.opening_balance = decimal.Decimal(sender.initial_balance)
+                    # update form field from form data
+                    new_key = form.save()
+                    add_value = MoneyTransfer.objects.get(id=new_key.pk)
+                    add_value.from_account = sender.account_no
+                    add_value.transaction_mode = "send-money"
+                    add_value.owner = sender.user
+                    add_value.deposit_amount = decimal.Decimal(0)
+                    add_value.opening_balance = decimal.Decimal(sender.initial_balance)
 
-                # credit amount from receiver account
-                receiver = UserBankAccount.objects.get(account_no=request.POST.get('to_account'))
-                receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
-                sender.save()
-                receiver.save()
+                    # credit amount from receiver account
+                    receiver = UserBankAccount.objects.get(account_no=request.POST.get('to_account'))
+                    receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
+                    sender.save()
+                    receiver.save()
 
-                # closing_bal.closing_balance = 423
-                add_value.save()
-                print(add_value.opening_balance)
-                return redirect("homepage")
+                    # closing_bal.closing_balance = 423
+                    add_value.save()
+                    print(add_value.opening_balance)
+                    return redirect("homepage")
+                else:
+                    message = "Insufficient Balance!"
+                    return render(request, "accountapp/transfer_money.html", {"message": message})
             else:
-                message = "Insufficient Balance!"
-                return render(request, "accountapp/transfer_money.html", {"message": message})
+                messages.info(request, "Invalid Info please try again")
+                return redirect("homepage")
         else:
-            messages.info(request, "Invalid Info please try again")
-            return redirect("homepage")
+            mail_id = request.session['email']
+            user_id = User_Model.objects.get(email=mail_id)
+            form = MoneyTransferForm()
+            user_balance = UserBankAccount.objects.filter(user=user_id)
+            for b in user_balance:
+                print(b.initial_balance)
+            content = {
+                'form': form,
+                'user_name': user_id.name,
+                'balance': b.initial_balance
+            }
+            return render(request, "accountapp/transfer_money.html", content)
     else:
-        mail_id = request.session['email']
-        user_id = User_Model.objects.get(email=mail_id)
-        form = MoneyTransferForm()
-        user_balance = UserBankAccount.objects.filter(user=user_id)
-        for b in user_balance:
-            print(b.initial_balance)
-        content = {
-            'form': form,
-            'user_name': user_id.name,
-            'balance': b.initial_balance
-        }
-        return render(request, "accountapp/transfer_money.html", content)
-
+        message = "exception"
+        return render(request, 'accountapp/home.html', {'message': message})
 
 def transaction_history(request):
     """
@@ -211,13 +231,17 @@ def transaction_history(request):
     for detail in account_detail:
         balance = detail.initial_balance
         user_name = detail.user
+        account_no = detail.account_no
+    print(balance)
+    print(user_name)
+    print(account_no)
 
     statement_id = MoneyTransfer.objects.filter(owner__email=request.session['email'])
     for statement in statement_id:
         print(statement.opening_balance)
     content = {
         'tran_id': statement_id,
-        'statement': statement,
+        'detail': detail,
         'user_name': user_name,
         'balance': balance,
     }
@@ -249,8 +273,11 @@ def withdraw(request):
             message = "Transaction Failed!, may be have insufficient balance"
             return render(request, 'accountapp/withdraw_money.html', {'message': message})
     # else:
-    #
-    return render(request, 'accountapp/withdraw_money.html')
+    account_detail = UserBankAccount.objects.filter(user__email=request.session['email'])
+    for i in account_detail:
+        balance = i.initial_balance
+        print(balance)
+    return render(request, 'accountapp/withdraw_money.html', {'account_detail': account_detail})
 
 
 def deposit(request):
@@ -278,4 +305,5 @@ def deposit(request):
         #     return render(request, 'accountapp/deposit_money.html', {'message': message})
     # else:
     #
-    return render(request, 'accountapp/deposit_money.html')
+    account_detail = UserBankAccount.objects.filter(user__email=request.session['email'])
+    return render(request, 'accountapp/deposit_money.html', {'account_detail': account_detail})

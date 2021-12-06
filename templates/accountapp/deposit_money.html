@@ -10,8 +10,10 @@
         <div class=" text-center" style="border: rgb(122, 115, 161); background-color: rgb(168, 181, 211); ">
     <h1>Deposit money</h1>
         </div><hr>
-    <h4>Account Holder : {{ user_name }}</h4>
-    <h3>Account no : {{ owner_account_no }}</h3> <hr>
+    {% for user in account_detail %}
+    <h4>Account Holder : {{ user.user }}</h4>
+    <h3>Account no : {{ user.account_no }}</h3> <hr>
+    {% endfor %}
 
     <div class="container-fluid">
         <div class="row">

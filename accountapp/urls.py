@@ -11,6 +11,7 @@ urlpatterns = [
     path('account/', views.account, name="account"),
     path('account/', views.account, name="account"),
     path('withdraw/', views.withdraw, name="withdraw"),
+    path('change_status/', views.change_status, name="change_status"),
     path('delete_account/<int:id>', views.delete_account, name="delete_account"),
     path('deposit/', views.deposit, name="deposit"),
     path('admin_login/', views.admin_login, name="admin_login"),

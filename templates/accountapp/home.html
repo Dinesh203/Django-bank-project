@@ -3,8 +3,16 @@
 {% block body %}
 {#{% include 'core/navbar.html' %}#}
 <br>
+{#thow exception when account is deactivate#}
+{% if message %}
+<br>
+<a href="{% url 'homepage' %}" class="btn btn-outline-dark" type="submit" >Back</a>
+<div class="col-sm-5  offset-1 alert alert-danger", style="background-color: rgb(252, 168, 185);">
+<h2>you can not make the transaction  if you want to do a transaction you should have activate your account first!!</h2></div> <hr>
+
+
 {#handel exception for invalid login attempt#}
-{% if exception %}
+{% elif exception %}
     {% include 'core/navbar.html' %}
     <br>
     <h4>If you are new to page please sign up details and login first.</h4>

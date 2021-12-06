@@ -13,10 +13,30 @@
   <body>
     {% block body %}
         {% include 'core/navbar.html' %}
-          <h2>WELCOME TO APNA BANK</h2>
-              {% include 'core/message.html' %}
-                {% block content %} <h2>Home page</h2>
+        {% block content %}
+        <div class="", style="background-color: rgb(206, 152, 152);">
+          <h1  style="border: 1px; text-align: center; font-style:normal;">APNA BANK</h1><hr>
+          <h5>
+            BANKING SY STEM There has been a rapid development in the banking institutions in various countries. With development, various systems of banking have come into existence. Banks can be classified on the basis of volume of operator, business pattern & areas of operations</h5>
+
+        </div>
+              {% comment %} {% include 'core/message.html' %} {% endcomment %}
+               
+                <div class="container" style="background-color: rgb(92, 100, 100);"></div>
+                
+                <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-sm-5  offset-1 alert alert-dark">
+                        <h5> <h3>About Banking system</h3>
+                          BANKING SY STEM There has been a rapid development in the banking institutions in various countries. With development, various systems of banking have come into existence. Banks can be classified on the basis of volume of operator, business pattern & areas of operations.
+                          DEFINITION OF BANKING Banking Regulation Act 1949 defines banking as, “ACCEPTING FOR THE PURPOSE OF LENDING AND INVESTMENT, OF DEPOSITS OF MONEY FROM THE PUBLIC, REPAYABLE ON DEMAND, ORDER OR OTHERWISE AND WITHDRAWABLE BY CHEQUE,DRAFT,ORDER OR OTHERWISE”... </h5> <hr>
+                      </div>
+                    </div>
+                </div>
+                <hr>
                 {% endblock content%}
+
+              </div>
 
     {% endblock body %}
 

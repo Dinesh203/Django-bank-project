@@ -10,13 +10,10 @@
     <h1 style="background-color: rgb(240, 227, 227); padding-bottom: 1%;">Transaction History</h1>
   </div>
   <div class="">
-  <h4>Account Holder : {{ statement.owner }}</h4>
-  <h3>From Account no : {{ statement.from_account }}</h3>
-  </div>
-
-
-<!-- {#    <a  href="#"  class="btn btn-outline-success" type="submit">Add Money</a>#}
-{#    <a  href="{% url 'login' %}"  class="btn btn-outline-success" type="submit">Login</a>#} -->
+  <h4>Account Holder : {{ detail.user }}</h4>
+  <h3>From Account no : {{ detail.account_no }}</h3>
+  </div> <hr>
+{% if tran_id %}
   <h5 class="text-center">statement</h5>
       <table class="table">
     <thead>
@@ -43,6 +40,13 @@
       </td>
       </tr>
     {% endfor %}
+
+    {% else %}
+    <div class="row col-sm-5 offset-3">
+    <h2 style="color: rgb(252, 252, 252); background-color: rgb(238, 104, 104);">Not make transaction yet!</h2>
+    </div>
+{% endif %}
+
 
     </tbody>
 
