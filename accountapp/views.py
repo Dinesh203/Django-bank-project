@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate
-from django.http.response import HttpResponseRedirect, HttpResponse
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -12,6 +12,7 @@ def home(request):
     """" home page """
     if 'email' in request.session:
         mail_id = request.session['email']
+        print(mail_id)
         user_id = User_Model.objects.get(email=mail_id)
         user_name = user_id.name
         if UserBankAccount.objects.filter(user__email=mail_id).exists():
@@ -59,7 +60,6 @@ def login(request):
         return render(request, 'accountapp/user_login.html')
 
 
-
 def account(request):
     """
     This function help to Create an account.
@@ -72,17 +72,20 @@ def account(request):
                 type_name = i.name
             account_form = UserBankAccountForm()
             content = {'account_form': account_form,
-                    'user_detail': user_id
-                    }
+                       'user_detail': user_id
+                       }
             if request.method == "POST":
                 account_no1 = request.POST['account_no']
+                account_type1 = request.POST['account_type']
                 initial_balance1 = request.POST['initial_balance']
                 gender1 = request.POST['gender']
+                contact1 = request.POST['contact']
                 birth_date1 = request.POST['birth_date']
                 address1 = request.POST['address']
-                account_obj = UserBankAccount.objects.create(user=user_id, account_type=type_name, account_no=account_no1,
-                                                    initial_balance=initial_balance1, gender=gender1,
-                                                    birth_date=birth_date1, address=address1)
+                account_obj = UserBankAccount.objects.create(user=user_id.name, account_type=account_type1,
+                                                             account_no=account_no1, initial_balance=initial_balance1,
+                                                             gender=gender1, contact=contact1,
+                                                             birth_date=birth_date1, address=address1)
                 account_obj.save()
                 # messages.success(request, "Account added successfully!")
                 return redirect('homepage')
@@ -92,8 +95,30 @@ def account(request):
         else:
             return HttpResponseRedirect("login", "Invalid Input login First")
     else:
-        messages.success(request,'Please Login To Enroll !')
+        messages.success(request, 'Please Login To Enroll !')
         return redirect('login')
+
+
+def user_profile(request):
+    """ This function helps to user can view profile and update.
+    """
+    if "email" in request.session:
+        # if request.method == 'POST':
+        #     profile = UserBankAccount.objects.filter(email=request.session['email'])
+        #     return render(request, 'accountapp/updateprofile.html', {"profile": profile})
+        # else:
+        profile = UserBankAccount.objects.get(user__email=request.session['email'])
+        return render(request, 'accountapp/user_profile.html', {"profile": profile})
+    else:
+        return redirect("login")
+
+
+def delete_account(request, id):
+    """ Delete Account
+    """
+    delete = UserBankAccount.objects.get(id=id)
+    delete.delete()
+    return redirect('login')
 
 
 def admin_login(request):
@@ -104,7 +129,12 @@ def admin_login(request):
         password1 = request.POST['password']
         if authenticate(username=username, password=password1):
             account_detail = UserBankAccount.objects.all()
-            return render(request, "accountapp/admin_panel.html", {'account_detail': account_detail})
+            user_detail = User_Model.objects.all()
+            context = {
+                "account_detail": account_detail,
+                "user_detail": user_detail
+            }
+            return render(request, "accountapp/admin_panel.html", context)
         else:
             msg = "Try again, Fill correct Detail"
             return render(request, "accountapp/admin_access.html", {"msg": msg})
@@ -139,6 +169,7 @@ def send_money(request):
                 add_value.from_account = sender.account_no
                 add_value.transaction_mode = "send-money"
                 add_value.owner = sender.user
+                add_value.deposit_amount = decimal.Decimal(0)
                 add_value.opening_balance = decimal.Decimal(sender.initial_balance)
 
                 # credit amount from receiver account
@@ -205,9 +236,11 @@ def withdraw(request):
             opening_balance1 = withdrawal.initial_balance
             user1 = withdrawal.user
             from_account1 = withdrawal.account_no
+            amount_placeholder = decimal.Decimal(0)
             transaction_mode1 = 'self-withdrawal'
             withdraw_form = MoneyTransfer.objects.create(owner=user1, from_account=from_account1, amount=amount1,
                                                          transaction_mode=transaction_mode1,
+                                                         deposit_amount=amount_placeholder,
                                                          opening_balance=opening_balance1)
             withdraw_form.save()
             print(withdraw_form.opening_balance)
@@ -219,7 +252,6 @@ def withdraw(request):
     #
     return render(request, 'accountapp/withdraw_money.html')
 
-    
 
 def deposit(request):
     """ Deposit money
@@ -234,14 +266,15 @@ def deposit(request):
         amount_placeholder = decimal.Decimal(0)
         transaction_mode1 = 'deposit-money'
         opening_balance1 = depositor.initial_balance
-        depositor_form = MoneyTransfer.objects.create(owner=user1, from_account=from_account1, amount=amount_placeholder,
-                                                        deposit_amount=amount1, transaction_mode=transaction_mode1,
-                                                        opening_balance=opening_balance1)
+        depositor_form = MoneyTransfer.objects.create(owner=user1, from_account=from_account1,
+                                                      amount=amount_placeholder,
+                                                      deposit_amount=amount1, transaction_mode=transaction_mode1,
+                                                      opening_balance=opening_balance1)
         depositor_form.save()
         print(depositor_form.opening_balance)
         return redirect('homepage')
         # else:
-        #     message = "Transaction Failed!, may be have insufficient balance"
+        #     message = "Transaction Failed!, may have insufficient balance"
         #     return render(request, 'accountapp/deposit_money.html', {'message': message})
     # else:
     #

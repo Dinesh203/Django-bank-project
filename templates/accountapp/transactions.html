@@ -42,19 +42,6 @@
         <td>{{ transact.opening_balance }}</td>
       </td>
       </tr>
-      {% comment %} {% if transact.transaction_mode == 'withdraw-money' %}
-      <tr>
-        <th scope="row">{{ transact.id }}</th>
-        <td>{{ transact.transaction_date }}</td>
-        <td>to {{ transact.to_account }}/{{ transact.transaction_mode }}</td>
-        <td>{{ transact.amount }}</td>
-        <td>{{ transact.amount }}</td>
-        <td>{{ transact.opening_balance }}</td>
-        <td>{{ balance }}</td>
-        <td>{{ statement.openinig_balance }}</td>
-      </td>
-      </tr>
-      {% endif %} {% endcomment %}
     {% endfor %}
 
     </tbody>

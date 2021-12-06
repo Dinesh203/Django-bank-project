@@ -7,43 +7,52 @@
     <title>Admin Panel</title>
 </head>
 <body>
-<h2>User's Account Detail</h2>
-    <a  href="#"  class="btn btn-outline-success" type="submit">Add Money</a>
+
+{#    <a  href="#"  class="btn btn-outline-success" type="submit">Go To Home</a>#}
 {#    <a  href="{% url 'login' %}"  class="btn btn-outline-success" type="submit">Login</a>#}
-
-
-
+<h2>User's Account Detail</h2>
 <hr>
+{% if incative %}
+     <h2>inactive</h2>
+
+{% endif %}
     <table class="table">
   <thead>
     <tr>
       <th scope="col">Id</th>
       <th scope="col">Name</th>
       <th scope="col">Account No</th>
+        <th scope="col">Date of opening</th>
       <th scope="col">Contact</th>
       <th scope="col">Address</th>
-      <th scope="col">DOB</th>
-      <th scope="col">Status</th>
+      <th scope="col">Email</th>
+      <th scope="col">Balance</th>
     </tr>
   </thead>
 
   <tbody>
-  {% for dtl in account_detail %}
+
+
+  {% for user in user_detail %}
+      {% for acc in account_detail %}
+          {% if user.name == acc.user.name %}
+
     <tr>
-      <th scope="row">{{ dtl.user_id }}</th>
-      <td>{{ dtl.user }}</td>
-      <td>{{ dtl.account_no}}</td>
-      <td>{{ dtl.contact }}</td>
-      <td>{{ dtl.address }}</td>
-      <td>{{ dtl.birth_date }}</td>
-      <td><a href="#" type="submit">Add Money</a>
-    </td>
+      <th scope="row">{{ user.id }}</th>
+      <td>{{ user.name }}</td>
+      <td>{{ acc.account_no }}</td>
+      <td>{{ acc.date_of_opening }}</td>
+      <td>{{ acc.contact }}</td>
+      <td>{{ user.address }}</td>
+      <td>{{ user.email }}
+      <td>{{ acc.initial_balance }}
     </tr>
+          {% endif %}
+          {% endfor %}
   {% endfor %}
   </tbody>
 
 </table>
 </body>
-</html>
 
 {% endblock body %}

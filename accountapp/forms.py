@@ -26,7 +26,8 @@ class UserBankAccountForm(forms.ModelForm):
 
     class Meta:
         model = UserBankAccount
-        fields = "__all__"
+        fields = ['account_type', 'account_no', 'initial_balance', 'contact', 'gender',
+                  'birth_date', 'address']
 
 
 class MoneyTransferForm(forms.ModelForm):

@@ -1,3 +1,4 @@
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 import random
@@ -57,6 +58,7 @@ class UserBankAccount(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICE)
     birth_date = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=50, blank=True)
+    status = models.BooleanField(max_length=1, default=True, auto_created=True)
 
     def __str__(self):
         return str(self.account_no)

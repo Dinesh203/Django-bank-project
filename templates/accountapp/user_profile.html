@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>user_profile</title>
+</head>
+<body>
+
+<br>
+<a href="{% url 'homepage' %}" class="btn btn-outline-dark" type="submit" >Back</a>
+<a href="{% url 'delete_account' profile.user_id %}" class="btn btn-outline-danger" type="submit" >Delete Account</a>
+<hr>
+
+{#{% if user_id %}#}
+ <h5 class="text-center"> User profile</h5>
+      <table class="table">
+
+      <tr style="width:auto; background-color: rgb(228, 156, 184);">
+        <th scope="row">Lable</th>
+           <th>Detail</th>
+          </tr>
+          <tr>
+              <th>Name</th>
+              <td>{{ profile.user }}</td>
+          </tr>
+          <tr>
+              <th>Contact</th>
+              <td>{{ profile.contact }}</td>
+          </tr>
+          <tr>
+              <th>Account no.</th>
+              <td>{{ profile.account_no }}</td>
+          </tr>
+          <tr>
+              <th>Birth Date</th>
+              <td>{{ profile.birth_date }}</td>
+          </tr>
+          <tr>
+              <th>Date of opening</th>
+              <td>{{ profile.date_of_opening }}</td>
+          </tr>
+          <tr>
+              <th>Available Balance</th>
+              <td>{{ profile.initial_balance }}</td>
+          </tr>
+          <tr>
+              <th>Address</th>
+              <td>{{ profile.address }}</td>
+          </tr>
+          <tr>
+              <th>Status</th>
+              <td><a href="#" class="btn btn-outline-success" type="submit" >Deactivate</a>
+</td>
+          </tr>
+
+  </table>
+{##}
+{#{% else %}#}
+{#    <h1>Detail Not Available</h1>#}
+{#{% endif %} <br>#}
+</body>
+</html>
+
+{% endblock %}
+
+
+
+
+
+
+
+{#    <br>  <br> <h3>Welcome: {{ name }}</h3> <br>#}
+{#    {% for d in user_id %}#}
+{#        <div class="card" style="width: 18rem;">#}
+{#            <img src="{{d.image.url}}" style="height:200px;width:250px;" alt="...">#}
+{#            <div class="card-body">#}
+{#                <h5 class="card-title">{{d.title}}</h5>#}
+{#                <p class="card-text">{{d.description}}</p>#}
+{#                <a href="#" class="btn btn-primary">view</a>#}
+{#              <a href="{% url 'deleteblog' d.id %}">Delete</a><br>#}
+{#                <p>#}
+{#                {% if d.status %}#}
+{#                    <a href="#" class="btn btn-success">Approved</a>#}
+{#                    <br>#}
+{##}
+{#                {% else %}<a href="#" class="btn btn-danger">UnApproved</a> <br>#}
+{#                {% endif %}#}
+{#                </p>#}
+{##}
+{#                {{p.publish}}#}
+{#            </div>#}
+{#        </div> <br><br>#}
+{#{% endfor %}#}
