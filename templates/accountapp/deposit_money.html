@@ -3,12 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Withdrawal</title>
+    <title>Deposit</title>
 </head>
 <body>
     <br>
         <div class=" text-center" style="border: rgb(122, 115, 161); background-color: rgb(168, 181, 211); ">
-    <h1>Withdraw money</h1>
+    <h1>Deposit money</h1>
         </div><hr>
     <h4>Account Holder : {{ user_name }}</h4>
     <h3>Account no : {{ owner_account_no }}</h3> <hr>
@@ -16,17 +16,17 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-5  offset-1 alert alert-danger" >
-            <h4 class="text-center alert alert-dark" >Fill Withdrawal Amount</h4>
-            <form action="{% url 'withdraw'%}" method="POST">
+            <h4 class="text-center" style="padding-bottom: 5px;" >Add Money</h4>
+            <form action="{% url 'deposit'%}" method="POST">
                 {% csrf_token %}
             <p>
             <label>Enter Amount
-            <input type="text" name="amount" required>
+            <input type="text" name="deposit_amount" required>
             </label>
             </p>
              <table>
             <tr>
-             <td><input type="submit" name="submit" value="Comferm"/></td>
+             <td><input type="submit" name="submit" value="Conferm"/></td>
             </tr>
             </table>
             </form>

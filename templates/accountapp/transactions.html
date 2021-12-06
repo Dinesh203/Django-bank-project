@@ -1,44 +1,60 @@
 {% extends "base.html" %}
 {% block body %}
-{#{% include 'home_navbar' %}#}
+
 <head>
     <meta charset="UTF-8">
     <title>Transactions</title>
 </head>
 <body>
+  <div class="text-center" style="padding-top: 10px;">
+    <h1 style="background-color: rgb(240, 227, 227); padding-bottom: 1%;">Transaction History</h1>
+  </div>
+  <div class="">
+  <h4>Account Holder : {{ statement.owner }}</h4>
+  <h3>From Account no : {{ statement.from_account }}</h3>
+  </div>
 
-  <h2>Transaction History</h2><hr>
-  <h4>Account Holder : {{ user_name }}</h4>
-  <h3>From Account no : {{ owner_account_no }}</h3>
 
-{#    <a  href="#"  class="btn btn-outline-success" type="submit">Add Money</a>#}
-{#    <a  href="{% url 'login' %}"  class="btn btn-outline-success" type="submit">Login</a>#}
+<!-- {#    <a  href="#"  class="btn btn-outline-success" type="submit">Add Money</a>#}
+{#    <a  href="{% url 'login' %}"  class="btn btn-outline-success" type="submit">Login</a>#} -->
   <h5 class="text-center">statement</h5>
-  <hr>
       <table class="table">
     <thead>
-      <tr>
+      <tr style="width:auto; background-color: rgb(228, 156, 184);">
         <th scope="col">Id</th>
         <th scope="col">Date</th>
         <th scope="col">particular</th>
         <th scope="col">Debit</th>
         <th scope="col">Credit</th>
         <th scope="col">Closing Balance</th>
+
       </tr>
     </thead>
 
-    <tbody>
+    <tbody style="border:black;">
     {% for transact in tran_id %}
       <tr>
         <th scope="row">{{ transact.id }}</th>
         <td>{{ transact.transaction_date }}</td>
-        <td>to {{ transact.from_to }}/{{ transact.remark }}</td>
+        <td>to {{ transact.to_account }}/{{ transact.transaction_mode }}</td>
         <td>{{ transact.amount }}</td>
-        <td>NA</td>
+        <td> {{transact.deposit_amount}} </td>
         <td>{{ transact.opening_balance }}</td>
-  {#      <td><a href="#" type="submit">Add Money</a>#}
       </td>
       </tr>
+      {% comment %} {% if transact.transaction_mode == 'withdraw-money' %}
+      <tr>
+        <th scope="row">{{ transact.id }}</th>
+        <td>{{ transact.transaction_date }}</td>
+        <td>to {{ transact.to_account }}/{{ transact.transaction_mode }}</td>
+        <td>{{ transact.amount }}</td>
+        <td>{{ transact.amount }}</td>
+        <td>{{ transact.opening_balance }}</td>
+        <td>{{ balance }}</td>
+        <td>{{ statement.openinig_balance }}</td>
+      </td>
+      </tr>
+      {% endif %} {% endcomment %}
     {% endfor %}
 
     </tbody>

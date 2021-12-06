@@ -1,7 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 import random
-from django.contrib.auth.models import User
+
 
 # Create your models here.
 
@@ -71,6 +71,7 @@ class MoneyTransfer(models.Model):
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     transaction_date = models.DateField(auto_now_add=True)
     remark = models.CharField(max_length=50, null=True)
+    transaction_mode = models.CharField(max_length=50, null=True)
     opening_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def __str__(self):
