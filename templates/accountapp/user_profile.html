@@ -51,7 +51,15 @@
               <td>{{ profile.address }}</td>
           </tr>
           <tr>
-              <th>Status</th>
+              <th>status</th>
+              <td>{% if profile.status == True %}
+                    <h6>Activate</h6>
+                  {% else %}
+                    <h6>Deactivate</h6>
+                  {% endif %}</td>
+          </tr>
+          <tr>
+              <th>Change Status</th>
               <td>
                 {% if profile.status == True %}
                 <a href="{% url 'change_status' %}" class="btn btn-outline-success" type="submit" >Deactivate

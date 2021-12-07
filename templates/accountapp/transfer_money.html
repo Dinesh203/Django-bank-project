@@ -12,8 +12,8 @@
 {% if message %}
     <h2 style="color: rgb(167, 20, 27);" >{{ message }}</h2>
     {% else %}
-        <div class="container-fluid">
-    <div class="row">
+    <div class="container-fluid">
+        <div class="row">
         <div class="col-sm-5  offset-1 alert alert-danger" >
             <h3 class="text-center alert alert-success" >Fill The Account Detail  </h3>
             <form action="{% url 'send_money'%}" method="POST">
@@ -28,8 +28,8 @@
             </table>
             </form>
         </div>
+        </div>
     </div>
-</div>
-    {% endif %}
+{% endif %}
 
 {% endblock %}

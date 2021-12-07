@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Withdrawal</title>
@@ -13,9 +14,16 @@
     {% for user in account_detail %}
     <h4>Account Holder : {{ user.user }}</h4>
     <h3>Account no : {{ user.account_no }}</h3> <hr>
-    {% endfor %}
+    {% endfor %} <hr>
     
+{% if exception %}
+    <div class=" row col-sm-5" ><
+    <h2 style="color: rgb(167, 20, 27);" > Account deactivation Alert!!  You can not withdraw money because your account is deactivate</h2></div> <hr>
 
+{% elif message %}
+    <h3>Error occur = {{ message }}</h3>
+
+{% else %}
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-5  offset-1 alert alert-danger" >
@@ -36,8 +44,6 @@
             </div>
         </div>
     </div>
-{% if message %}
-    <h3>Error occur = {{ message }}</h3>
 {% endif %}
 </body>
 </html>

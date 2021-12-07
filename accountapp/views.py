@@ -111,28 +111,33 @@ def user_profile(request):
     """ This function helps to user can view profile and update.
     """
     if "email" in request.session:
-        profile = UserBankAccount.objects.get(user__email=request.session['email'])
-        return render(request, 'accountapp/user_profile.html', {"profile": profile})
+        if UserBankAccount.objects.get(user__email=request.session['email']):
+            profile = UserBankAccount.objects.get(user__email=request.session['email'])
+            return render(request, 'accountapp/user_profile.html', {"profile": profile})
     else:
         return redirect("login")
 
 
 def change_status(request):
-    change_status = UserBankAccount.objects.get(user__email=request.session['email'])
-    print(change_status.status)
-    if change_status.status == True:
-        change_status.status = False
-        change_status.save()
+    """ user can change account status like active/deactivate.
+    """
+    change = UserBankAccount.objects.get(user__email=request.session['email'])
+    if change.status:
+        change.status = False
+        change.save()
     else:
-        change_status.status = True
-        change_status.save()
+        change.status = True
+        change.save()
     return redirect('homepage')
 
 
 def delete_account(request, id):
     """ Delete Account
     """
-    delete = UserBankAccount.objects.get(id=id)
+    print(id)
+    # account_detail = UserBankAccount.objects.get(user_id=id)
+    # print(account_detail)
+    delete = UserBankAccount.objects.get(user_id=id)
     delete.delete()
     return redirect('login')
 
@@ -171,37 +176,38 @@ def send_money(request):
     Make a transaction, send Money to another account holder.
     """
     check_status = UserBankAccount.objects.get(user__email=request.session['email'])
-    if check_status.status == True:
+    if check_status.status:
         if request.method == 'POST':
             form = MoneyTransferForm(request.POST)
             if form.is_valid():
                 sender = UserBankAccount.objects.get(user__email=request.session['email'])
 
                 # debit amount from sender account
-                if sender.initial_balance > decimal.Decimal(request.POST.get('amount')):
-                    sender.initial_balance -= decimal.Decimal(request.POST.get('amount'))
+                if sender.account_no != request.POST.get('to_account'):
+                    if sender.initial_balance > decimal.Decimal(request.POST.get('amount')):
+                        sender.initial_balance -= decimal.Decimal(request.POST.get('amount'))
 
-                    # update form field from form data
-                    new_key = form.save()
-                    add_value = MoneyTransfer.objects.get(id=new_key.pk)
-                    add_value.from_account = sender.account_no
-                    add_value.transaction_mode = "send-money"
-                    add_value.owner = sender.user
-                    add_value.deposit_amount = decimal.Decimal(0)
-                    add_value.opening_balance = decimal.Decimal(sender.initial_balance)
+                        # update form field from form data
+                        new_key = form.save()
+                        add_value = MoneyTransfer.objects.get(id=new_key.pk)
+                        add_value.from_account = sender.account_no
+                        add_value.transaction_mode = "send-money"
+                        add_value.owner = sender.user
+                        add_value.deposit_amount = decimal.Decimal(0)
+                        add_value.opening_balance = decimal.Decimal(sender.initial_balance)
 
-                    # credit amount from receiver account
-                    receiver = UserBankAccount.objects.get(account_no=request.POST.get('to_account'))
-                    receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
-                    sender.save()
-                    receiver.save()
+                        # credit amount from receiver account
+                        receiver = UserBankAccount.objects.get(account_no=request.POST.get('to_account'))
+                        receiver.initial_balance += decimal.Decimal(request.POST.get('amount'))
+                        sender.save()
+                        receiver.save()
 
-                    # closing_bal.closing_balance = 423
-                    add_value.save()
-                    print(add_value.opening_balance)
-                    return redirect("homepage")
+                        # closing_bal.closing_balance = 423
+                        add_value.save()
+                        print(add_value.opening_balance)
+                        return redirect("homepage")
                 else:
-                    message = "Insufficient Balance!"
+                    message = "Insufficient Balance! or Invalid Detail!"
                     return render(request, "accountapp/transfer_money.html", {"message": message})
             else:
                 messages.info(request, "Invalid Info please try again")
@@ -223,6 +229,7 @@ def send_money(request):
         message = "exception"
         return render(request, 'accountapp/home.html', {'message': message})
 
+
 def transaction_history(request):
     """
     :return: View transaction history
@@ -232,10 +239,6 @@ def transaction_history(request):
         balance = detail.initial_balance
         user_name = detail.user
         account_no = detail.account_no
-    print(balance)
-    print(user_name)
-    print(account_no)
-
     statement_id = MoneyTransfer.objects.filter(owner__email=request.session['email'])
     for statement in statement_id:
         print(statement.opening_balance)
@@ -251,59 +254,66 @@ def transaction_history(request):
 def withdraw(request):
     """ withdrawal money
     """
-    if request.method == 'POST':
-        amount1 = request.POST['amount']
-        withdrawal = UserBankAccount.objects.get(user__email=request.session['email'])
-        if withdrawal.initial_balance > decimal.Decimal(amount1):
-            withdrawal.initial_balance -= decimal.Decimal(amount1)
-            withdrawal.save()
-            opening_balance1 = withdrawal.initial_balance
-            user1 = withdrawal.user
-            from_account1 = withdrawal.account_no
-            amount_placeholder = decimal.Decimal(0)
-            transaction_mode1 = 'self-withdrawal'
-            withdraw_form = MoneyTransfer.objects.create(owner=user1, from_account=from_account1, amount=amount1,
-                                                         transaction_mode=transaction_mode1,
-                                                         deposit_amount=amount_placeholder,
-                                                         opening_balance=opening_balance1)
-            withdraw_form.save()
-            print(withdraw_form.opening_balance)
-            return redirect('homepage')
-        else:
-            message = "Transaction Failed!, may be have insufficient balance"
-            return render(request, 'accountapp/withdraw_money.html', {'message': message})
-    # else:
-    account_detail = UserBankAccount.objects.filter(user__email=request.session['email'])
-    for i in account_detail:
-        balance = i.initial_balance
-        print(balance)
-    return render(request, 'accountapp/withdraw_money.html', {'account_detail': account_detail})
+    check_status = UserBankAccount.objects.get(user__email=request.session['email'])
+    if check_status.status:
+        if request.method == 'POST':
+            amount1 = request.POST['amount']
+            withdrawal = UserBankAccount.objects.get(user__email=request.session['email'])
+            if withdrawal.initial_balance > decimal.Decimal(amount1):
+                withdrawal.initial_balance -= decimal.Decimal(amount1)
+                withdrawal.save()
+                opening_balance1 = withdrawal.initial_balance
+                user1 = withdrawal.user
+                from_account1 = withdrawal.account_no
+                amount_placeholder = decimal.Decimal(0)
+                transaction_mode1 = 'self-withdrawal'
+                withdraw_form = MoneyTransfer.objects.create(owner=user1, from_account=from_account1, amount=amount1,
+                                                             transaction_mode=transaction_mode1,
+                                                             deposit_amount=amount_placeholder,
+                                                             opening_balance=opening_balance1)
+                withdraw_form.save()
+                print(withdraw_form.opening_balance)
+                return redirect('homepage')
+            else:
+                message = "Transaction Failed!, may be have insufficient balance"
+                return render(request, 'accountapp/withdraw_money.html', {'message': message})
+        # else:
+        account_detail = UserBankAccount.objects.filter(user__email=request.session['email'])
+        for i in account_detail:
+            balance = i.initial_balance
+            print(balance)
+        return render(request, 'accountapp/withdraw_money.html', {'account_detail': account_detail})
+    else:
+        exception = "e"
+        return render(request, 'accountapp/withdraw_money.html', {'exception': exception})
 
 
 def deposit(request):
     """ Deposit money
     """
-    if request.method == 'POST':
-        amount1 = request.POST['deposit_amount']
-        depositor = UserBankAccount.objects.get(user__email=request.session['email'])
-        depositor.initial_balance += decimal.Decimal(amount1)
-        depositor.save()
-        user1 = depositor.user
-        from_account1 = depositor.account_no
-        amount_placeholder = decimal.Decimal(0)
-        transaction_mode1 = 'deposit-money'
-        opening_balance1 = depositor.initial_balance
-        depositor_form = MoneyTransfer.objects.create(owner=user1, from_account=from_account1,
-                                                      amount=amount_placeholder,
-                                                      deposit_amount=amount1, transaction_mode=transaction_mode1,
-                                                      opening_balance=opening_balance1)
-        depositor_form.save()
-        print(depositor_form.opening_balance)
-        return redirect('homepage')
-        # else:
-        #     message = "Transaction Failed!, may have insufficient balance"
-        #     return render(request, 'accountapp/deposit_money.html', {'message': message})
-    # else:
-    #
-    account_detail = UserBankAccount.objects.filter(user__email=request.session['email'])
-    return render(request, 'accountapp/deposit_money.html', {'account_detail': account_detail})
+    check_status = UserBankAccount.objects.get(user__email=request.session['email'])
+    if check_status.status:
+        if request.method == 'POST':
+            amount1 = request.POST['deposit_amount']
+            depositor = UserBankAccount.objects.get(user__email=request.session['email'])
+            depositor.initial_balance += decimal.Decimal(amount1)
+            depositor.save()
+            user1 = depositor.user
+            from_account1 = depositor.account_no
+            amount_placeholder = decimal.Decimal(0)
+            transaction_mode1 = 'deposit-money'
+            opening_balance1 = depositor.initial_balance
+            depositor_form = MoneyTransfer.objects.create(owner=user1, from_account=from_account1,
+                                                          amount=amount_placeholder,
+                                                          deposit_amount=amount1, transaction_mode=transaction_mode1,
+                                                          opening_balance=opening_balance1)
+            depositor_form.save()
+            print(depositor_form.opening_balance)
+            return redirect('homepage')
+
+        account_detail = UserBankAccount.objects.filter(user__email=request.session['email'])
+        return render(request, 'accountapp/deposit_money.html', {'account_detail': account_detail})
+    else:
+        exception = "e"
+        return render(request, 'accountapp/deposit_money.html', {'exception': exception})
+
