@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accountapp',
+    'django_celery_beat',
+    'django_celery_results',
+    'celery',
     'core'
 ]
 
@@ -136,6 +139,24 @@ STATICFILES_DIRS =( os.path.join(BASE_DIR ,'media')
 ,)
 
 
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+# CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+
+CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_RESULT_BACKEND = 'db+sqlite:///results.db'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'Subham632541@gmail.com'
+EMAIL_HOST_PASSWORD = 'Shubham@123'
+EMAIL_USE_TLS = True
 # MESSAGE_TAGS = {
 #     messages.DEBUG: 'alert-info',
 #     messages.INFO:'alert-info',

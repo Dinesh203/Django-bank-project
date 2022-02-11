@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from .forms import UserForm, UserBankAccountForm, MoneyTransferForm
 from .models import User_Model, UserBankAccount, BankAccountType, MoneyTransfer
 import decimal
+from django.core.mail import send_mail
+from BankingSystem import settings
 
 
 # account_detail = UserBankAccount.objects.filter(user__email=request.session)
@@ -42,11 +44,21 @@ def signup(request):
         form = UserForm(request.POST)
         if form.is_valid():
             form.save()
+
+            subject = "Check celery work"
+            email_body = "This is email body"
+            email = form.email
+            sent = send_mail(subject, email_body, settings.EMAIL_HOST_USER, [email])
+            print("send mail Done", sent)
+
             # msg = messages.success(request, 'Created User successfully!')
             return render(request, "accountapp/user_login.html")
     else:
         form = UserForm()
     return render(request, "accountapp/user_signup.html", {'form': form})
+
+
+# def send_email(subject, email_body, receiver):
 
 
 def login(request):
