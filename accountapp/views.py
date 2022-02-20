@@ -8,13 +8,11 @@ from .models import User_Model, UserBankAccount, BankAccountType, MoneyTransfer
 import decimal
 from django.core.mail import send_mail
 from BankingSystem import settings
+import logging
 
 
-# account_detail = UserBankAccount.objects.filter(user__email=request.session)
-# for detail in account_detail:
-#     balance = detail.initial_balance
-#     user_name = detail.user
-#     account_no = detail.account_no
+logger = logging.getLogger()
+
 
 def home(request):
     """" home page """
@@ -44,12 +42,23 @@ def signup(request):
         form = UserForm(request.POST)
         if form.is_valid():
             form.save()
+            logger.info('user logger info register successfully')
+            logger.debug('user logger debug register successfully')
+            logger.info('user logger warning register successfully')
+            logger.error('user logger error register successfully')
+            logger.critical('user logger critical register successfully')
 
-            subject = "Check celery work"
-            email_body = "This is email body"
-            email = form.email
-            sent = send_mail(subject, email_body, settings.EMAIL_HOST_USER, [email])
-            print("send mail Done", sent)
+            logging.info('user info register successfully')
+            logging.debug('user debug register successfully')
+            logging.info('user warning register successfully')
+            logging.error('user error register successfully')
+            logging.critical('user critical register successfully')
+
+            # subject = "Check celery work"
+            # email_body = "This is email body"
+            # # email = form.email
+            # sent = send_mail(subject, email_body, settings.EMAIL_HOST_USER, [email])
+            # print("send mail Done", sent)
 
             # msg = messages.success(request, 'Created User successfully!')
             return render(request, "accountapp/user_login.html")
