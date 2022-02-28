@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.core.mail import send_mail
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -6,41 +7,50 @@ from django.contrib.auth.models import User
 from .forms import UserForm, UserBankAccountForm, MoneyTransferForm
 from .models import User_Model, UserBankAccount, BankAccountType, MoneyTransfer
 import decimal
+from django.conf import settings
+import socket
+from ipware import get_client_ip
+from icalendar import Calendar, Event, vCalAddress, vText
+import pytz
+from datetime import datetime
+import os
+from pathlib import Path
 
-
-# account_detail = UserBankAccount.objects.filter(user__email=request.session)
-# for detail in account_detail:
-#     balance = detail.initial_balance
-#     user_name = detail.user
-#     account_no = detail.account_no
 
 def home(request):
     """" home page """
     if 'email' in request.session:
         mail_id = request.session['email']
         print(mail_id)
-        user_id = User_Model.objects.get(email=mail_id)
-        user_name = user_id.name
-        if UserBankAccount.objects.filter(user__email=mail_id).exists():
-            account_detail = UserBankAccount.objects.get(user__email=mail_id)
-            content = {
-                'user_name': user_name,
-                'account_detail': account_detail
-            }
-            return render(request, 'accountapp/home.html', content)
+        user_id = User_Model.objects.filter(email=mail_id)
+        for i in user_id:
+            user_name = i.name
+            if UserBankAccount.objects.filter(user__email=mail_id).exists():
+                account_detail = UserBankAccount.objects.get(user__email=mail_id)
+                content = {
+                    'user_name': user_name,
+                    'account_detail': account_detail
+                }
+                return render(request, 'accountapp/home.html', content)
     else:
         e = "error occur!"
         return render(request, 'accountapp/home.html', {'exception': e})
     return render(request, 'accountapp/home.html')
 
 
-def signup(request):
+def signup(request, setting=None):
     """
     :return: Signup page and Create user basic detail.
     """
     if request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
+            user_email = request.POST['email']
+            print(user_email)
+            send_mail("first mail", "this is email body", settings.EMAIL_HOST_USER, ['subham632541@gmail.com'],
+                      fail_silently=False)
+            print("send mail")
+
             form.save()
             # msg = messages.success(request, 'Created User successfully!')
             return render(request, "accountapp/user_login.html")
@@ -95,7 +105,6 @@ def account(request):
                                                              gender=gender1, contact=contact1,
                                                              birth_date=birth_date1, address=address1)
                 account_obj.save()
-                # messages.success(request, "Account added successfully!")
                 return redirect('homepage')
             else:
                 pass
@@ -107,15 +116,81 @@ def account(request):
         return redirect('login')
 
 
+def event_scheduler(request):
+    user = UserBankAccount.objects.get(user__email=request.session['email'])
+    birth_date = user.birth_date
+    print(birth_date)
+
+    cal = Calendar()
+    cal.add('attendee', 'MAILTO:abc@example.com')
+    cal.add('attendee', 'MAILTO:xyz@example.com')
+
+    event = Event()
+    event.add('summary', 'Python meeting about calendaring')
+    event.add('dtstart', datetime(2022, 10, 24, 8, 0, 0, tzinfo=pytz.utc))
+    event.add('dtend', datetime(2022, 10, 24, 10, 0, 0, tzinfo=pytz.utc))
+    event.add('dtstamp', datetime(2022, 10, 24, 0, 10, 0, tzinfo=pytz.utc))
+    event.add('description', 'This is event description')
+
+    organizer = vCalAddress('MAILTO:hello@example.com')
+    organizer.params['cn'] = vText('Sir Jon')
+    organizer.params['role'] = vText('CEO')
+    event['organizer'] = organizer
+    event['location'] = vText('London, UK')
+
+    # Adding events to calendar
+    cal.add_component(event)
+
+    os.getcwd()
+    directory = str(Path(__file__).parent.parent) + "/calender"
+    print("ics file will be generated at ", directory)
+    # os.mkdir(os.path.join(directory, "birth_date.ics"))
+    f = open("birth_date.ics", "wb")
+    f.write(cal.to_ical())
+    f.close()
+
+    return redirect('homepage')
+
+
 def user_profile(request):
     """ This function helps to user can view profile and update.
     """
+    # hostname = socket.gethostname()
+    # IPAddr = socket.gethostbyname(hostname)
+    # print("Your Computer Name is:" + hostname)
+    # print("Your Computer IP Address is:" + IPAddr)
+    ip, is_routable = get_client_ip(request)
+    if ip is None:
+        print("ip is none ", ip)
+    # Unable to get the client's IP address
+    else:
+
+        # We got the client's IP address
+        if is_routable:
+            print("is routable", is_routable)
+        # The client's IP address is publicly routable on the Internet
+        else:
+            print("ip is private address")
+    # The client's IP address is private
+
+    # Order of precedence is (Public, Private, Loopback, None)
+    print(get_client_ip(request))
+
     if "email" in request.session:
         if UserBankAccount.objects.get(user__email=request.session['email']):
             profile = UserBankAccount.objects.get(user__email=request.session['email'])
             return render(request, 'accountapp/user_profile.html', {"profile": profile})
     else:
         return redirect("login")
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 
 def change_status(request):
@@ -213,18 +288,17 @@ def send_money(request):
                 messages.info(request, "Invalid Info please try again")
                 return redirect("homepage")
         else:
-            mail_id = request.session['email']
-            user_id = User_Model.objects.get(email=mail_id)
+            user_id = User_Model.objects.filter(email=request.session['email'])
+            user_name = [i.name for i in user_id]
+            user_balance = UserBankAccount.objects.filter(user__email=request.session['email'])
+            initial_bal = [j.initial_balance for j in user_balance]
             form = MoneyTransferForm()
-            user_balance = UserBankAccount.objects.filter(user=user_id)
-            for b in user_balance:
-                print(b.initial_balance)
-            content = {
+            context = {
                 'form': form,
-                'user_name': user_id.name,
-                'balance': b.initial_balance
+                'user_name': user_name,
+                'balance': initial_bal
             }
-            return render(request, "accountapp/transfer_money.html", content)
+            return render(request, "accountapp/transfer_money.html", context)
     else:
         message = "exception"
         return render(request, 'accountapp/home.html', {'message': message})
@@ -316,4 +390,3 @@ def deposit(request):
     else:
         exception = "e"
         return render(request, 'accountapp/deposit_money.html', {'exception': exception})
-

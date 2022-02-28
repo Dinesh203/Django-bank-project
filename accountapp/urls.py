@@ -17,6 +17,7 @@ urlpatterns = [
     path('admin_login/', views.admin_login, name="admin_login"),
     path('send_money/', views.send_money, name="send_money"),
     path('tran_history/', views.transaction_history, name="transaction_history"),
+    path('event_scheduler/', views.event_scheduler, name="event_scheduler"),
 
 
 ]

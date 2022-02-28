@@ -1,8 +1,6 @@
-
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 import random
-
 
 # Create your models here.
 
@@ -78,6 +76,7 @@ class MoneyTransfer(models.Model):
 
     def __str__(self):
         return str(self.amount)
+
 
 # class UserBankAccountDetail(models.Model):
 #     name = models.CharField(max_length=150)
